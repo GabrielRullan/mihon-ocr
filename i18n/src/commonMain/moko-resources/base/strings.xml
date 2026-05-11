@@ -212,6 +212,7 @@
     <string name="pref_category_tracking">Tracking</string>
     <string name="pref_category_advanced">Advanced</string>
     <string name="pref_category_about">About</string>
+    <string name="pref_category_ocr">OCR &amp; Translation</string>
 
     <string name="pref_appearance_summary">Theme, date &amp; time format</string>
     <string name="pref_library_summary">Categories, global update, chapter swipe</string>
@@ -222,9 +223,13 @@
     <string name="pref_backup_summary">Manual &amp; automatic backups, storage space</string>
     <string name="pref_security_summary">App lock, secure screen</string>
     <string name="pref_advanced_summary">Dump crash logs, battery optimizations</string>
+    <string name="pref_ocr_summary">Offline OCR, translation, and dictionaries</string>
 
-      <!-- General section -->
-    <string name="pref_category_theme">Theme</string>
+    <string name="pref_dictionary_title">CC-CEDICT Dictionary</string>
+    <string name="pref_dictionary_summary">Download offline dictionary for word-by-word lookup</string>
+    <string name="pref_dictionary_installed">Dictionary Installed</string>
+    <string name="pref_dictionary_not_installed">Dictionary Not Installed</string>
+    <string name="action_download_dictionary">Download Dictionary</string>
     <string name="pref_app_theme">App theme</string>
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>

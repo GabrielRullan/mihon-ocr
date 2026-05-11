@@ -191,6 +191,12 @@ object SettingsMainScreen : Screen() {
             screen = SettingsReaderScreen,
         ),
         Item(
+            titleRes = MR.strings.pref_category_ocr,
+            subtitleRes = MR.strings.pref_ocr_summary,
+            icon = Icons.Outlined.Search,
+            screen = SettingsOCRScreen,
+        ),
+        Item(
             titleRes = MR.strings.pref_category_downloads,
             subtitleRes = MR.strings.pref_downloads_summary,
             icon = Icons.Outlined.GetApp,
