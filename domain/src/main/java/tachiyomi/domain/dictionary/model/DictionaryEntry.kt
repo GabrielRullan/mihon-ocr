@@ -5,5 +5,5 @@ data class DictionaryEntry(
     val simplified: String,
     val traditional: String,
     val pinyin: String,
-    val english: String
+    val english: String,
 )

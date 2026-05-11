@@ -9,6 +9,7 @@ import com.eygraber.sqldelight.androidx.driver.AndroidxSqliteDatabaseType
 import com.eygraber.sqldelight.androidx.driver.AndroidxSqliteDriver
 import com.eygraber.sqldelight.androidx.driver.FileProvider
 import eu.kanade.domain.track.store.DelayedTrackingStore
+import eu.kanade.tachiyomi.data.anki.AnkiManager
 import eu.kanade.tachiyomi.data.cache.ChapterCache
 import eu.kanade.tachiyomi.data.cache.CoverCache
 import eu.kanade.tachiyomi.data.download.DownloadCache
@@ -105,6 +106,7 @@ class AppModule(val app: Application) : InjektModule {
         addSingletonFactory { CoverCache(app) }
 
         addSingletonFactory { NetworkHelper(app, get()) }
+        addSingletonFactory { get<NetworkHelper>().client }
         addSingletonFactory { JavaScriptEngine(app) }
 
         addSingletonFactory<SourceManager> { AndroidSourceManager(app, get(), get()) }
@@ -118,6 +120,8 @@ class AppModule(val app: Application) : InjektModule {
         addSingletonFactory { DelayedTrackingStore(app) }
 
         addSingletonFactory { ImageSaver(app) }
+
+        addSingletonFactory { AnkiManager(app) }
 
         addSingletonFactory { AndroidStorageFolderProvider(app) }
         addSingletonFactory { LocalSourceFileSystem(get()) }

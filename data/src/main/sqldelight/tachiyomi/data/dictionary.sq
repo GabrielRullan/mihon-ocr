@@ -7,9 +7,13 @@ CREATE TABLE dictionary (
 );
 
 CREATE INDEX dictionary_simplified_index ON dictionary(simplified);
+CREATE INDEX dictionary_traditional_index ON dictionary(traditional);
 
 getEntryBySimplified:
 SELECT * FROM dictionary WHERE simplified = ?;
+
+getEntryBySimplifiedOrTraditional:
+SELECT * FROM dictionary WHERE simplified = ? OR traditional = ?;
 
 getEntriesBySimplifiedList:
 SELECT * FROM dictionary WHERE simplified IN ?;

@@ -202,6 +202,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.bundles.kotlinx.coroutines)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     implementation(libs.sqldelight.async)
 
@@ -220,6 +221,7 @@ dependencies {
 
     // Job scheduling
     implementation(libs.androidx.work)
+    implementation(libs.ankidroid.api)
 
     // RxJava
     implementation(libs.rxJava)

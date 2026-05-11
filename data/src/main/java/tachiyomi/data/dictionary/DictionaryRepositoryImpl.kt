@@ -17,6 +17,12 @@ class DictionaryRepositoryImpl(
             .awaitAsOneOrNull()
     }
 
+    override suspend fun getEntryBySimplifiedOrTraditional(text: String): DictionaryEntry? {
+        return database.dictionaryQueries
+            .getEntryBySimplifiedOrTraditional(text, text, ::mapDictionary)
+            .awaitAsOneOrNull()
+    }
+
     override suspend fun getEntriesBySimplifiedList(simplifiedList: List<String>): List<DictionaryEntry> {
         return database.dictionaryQueries
             .getEntriesBySimplifiedList(simplifiedList, ::mapDictionary)
@@ -30,7 +36,7 @@ class DictionaryRepositoryImpl(
                     entry.simplified,
                     entry.traditional,
                     entry.pinyin,
-                    entry.english
+                    entry.english,
                 )
             }
         }
@@ -49,12 +55,12 @@ class DictionaryRepositoryImpl(
         simplified: String,
         traditional: String,
         pinyin: String,
-        english: String
+        english: String,
     ): DictionaryEntry = DictionaryEntry(
         id = id,
         simplified = simplified,
         traditional = traditional,
         pinyin = pinyin,
-        english = english
+        english = english,
     )
 }

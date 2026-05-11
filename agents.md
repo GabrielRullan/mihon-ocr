@@ -26,8 +26,8 @@ Maintain and extend a custom Mihon fork that enables an offline "Mokuro" experie
 4. **Clean UI**: Use premium aesthetics (semi-transparent overlays, smooth animations).
 
 ## 🚀 Active Task
-- **Completed**: OCR background trigger, Translation popup, Overlay rendering, CC-CEDICT local dictionary integration.
-- **Next**: AnkiConnect Android integration for card creation.
+- **Completed**: OCR background trigger, Translation popup, Overlay rendering, CC-CEDICT local dictionary integration, AnkiDroid integration (One-tap).
+- **Next**: Customizable bubble highlights and visual themes.
 
 ## 🔗 References
 - [Mihon Repository](https://github.com/mihonapp/mihon)

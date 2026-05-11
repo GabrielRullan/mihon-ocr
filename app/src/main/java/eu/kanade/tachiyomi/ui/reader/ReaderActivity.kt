@@ -23,9 +23,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -343,16 +351,20 @@ class ReaderActivity : BaseActivity() {
                     title = { Text("Translation") },
                     text = {
                         val ocrDialog = state.dialog as ReaderViewModel.Dialog.OCRTranslation
+                        val ankiManager = remember { uy.kohesive.injekt.Injekt.get<eu.kanade.tachiyomi.data.anki.AnkiManager>() }
+                        val scope = androidx.compose.runtime.rememberCoroutineScope()
+                        val context = androidx.compose.ui.platform.LocalContext.current
+
                         androidx.compose.foundation.lazy.LazyColumn {
                             item {
                                 Text(text = "Original", style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
                                 Text(text = ocrDialog.original, style = androidx.compose.material3.MaterialTheme.typography.bodyLarge)
                                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(16.dp))
-                                
+
                                 Text(text = "Deep Translation", style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
                                 Text(text = ocrDialog.translation, style = androidx.compose.material3.MaterialTheme.typography.titleMedium, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(16.dp))
-                                
+
                                 if (ocrDialog.dictionaryEntries.isNotEmpty()) {
                                     Text(text = "Dictionary Breakdown", style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
                                     androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
@@ -366,9 +378,71 @@ class ReaderActivity : BaseActivity() {
                                     )
                                 ) {
                                     androidx.compose.foundation.layout.Column(modifier = Modifier.padding(8.dp)) {
-                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                            Text(text = entry.simplified, style = androidx.compose.material3.MaterialTheme.typography.bodyLarge, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-                                            Text(text = entry.pinyin, style = androidx.compose.material3.MaterialTheme.typography.bodyMedium, color = androidx.compose.material3.MaterialTheme.colorScheme.secondary)
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                val displayText = if (entry.simplified != entry.traditional) {
+                                                    "${entry.simplified} (${entry.traditional})"
+                                                } else {
+                                                    entry.simplified
+                                                }
+                                                Text(
+                                                    text = displayText,
+                                                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                                                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                                                )
+
+                                                // Colored Pinyin
+                                                val pinyinParts = entry.pinyin.split(" ")
+                                                Row {
+                                                    pinyinParts.forEach { part ->
+                                                        val color = when {
+                                                            part.contains("1") -> androidx.compose.ui.graphics.Color(0xFFF44336)
+                                                            part.contains("2") -> androidx.compose.ui.graphics.Color(0xFFFF9800)
+                                                            part.contains("3") -> androidx.compose.ui.graphics.Color(0xFF4CAF50)
+                                                            part.contains("4") -> androidx.compose.ui.graphics.Color(0xFF2196F3)
+                                                            else -> androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                                                        }
+                                                        Text(
+                                                            text = part + " ",
+                                                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                                                            color = color
+                                                        )
+                                                    }
+                                                }
+                                            }
+
+                                            // Anki Button
+                                            androidx.compose.material3.IconButton(
+                                                onClick = {
+                                                    if (!ankiManager.isAnkiInstalled()) {
+                                                        context.toast("AnkiDroid is not installed")
+                                                        return@IconButton
+                                                    }
+                                                    if (!ankiManager.hasPermission()) {
+                                                        context.toast("Please grant AnkiDroid permission in Settings")
+                                                        return@IconButton
+                                                    }
+                                                    scope.launch {
+                                                        val success = ankiManager.addCard(entry, ocrDialog.original)
+                                                        if (success) {
+                                                            context.toast("Added to Anki")
+                                                        } else {
+                                                            context.toast("Failed to add card")
+                                                        }
+                                                    }
+                                                },
+                                                modifier = Modifier.size(24.dp)
+                                            ) {
+                                                androidx.compose.material3.Icon(
+                                                    imageVector = Icons.Default.Add,
+                                                    contentDescription = "Add to Anki",
+                                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                                                )
+                                            }
                                         }
                                         Text(text = entry.english, style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                     }

@@ -3,21 +3,20 @@ package eu.kanade.tachiyomi.data.ocr
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import eu.kanade.tachiyomi.util.system.logcat
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import tachiyomi.core.common.util.system.logcat
 import java.io.File
 
 class OCRWorker(
     appContext: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
         val chapterPath = inputData.getString("chapter_path") ?: return Result.failure()
         val chapterFolder = File(chapterPath)
-        
+
         if (!chapterFolder.exists() || !chapterFolder.isDirectory) {
             return Result.failure()
         }

@@ -31,11 +31,18 @@
         android:name="android.permission.READ_APP_SPECIFIC_LOCALES"
         tools:ignore="ProtectedPermissions" />
 
+    <uses-permission android:name="com.ichi2.anki.permission.READ_WRITE_DATABASE" />
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <queries>
+        <package android:name="com.ichi2.anki" />
+    </queries>
 
     <application
         android:name=".App"
         android:allowBackup="false"
+        tools:replace="android:allowBackup"
         android:enableOnBackInvokedCallback="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"

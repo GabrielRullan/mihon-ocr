@@ -25,12 +25,13 @@ object SettingsOCRScreen : SearchableSettings {
     @Composable
     override fun getPreferences(): List<Preference> {
         val scope = rememberCoroutineScope()
-        val dictionaryRepository = remember { Injekt.get<tachiyomi.domain.dictionary.repository.DictionaryRepository>() }
+        val dictionaryRepository =
+            remember { Injekt.get<tachiyomi.domain.dictionary.repository.DictionaryRepository>() }
         val okHttpClient = remember { Injekt.get<okhttp3.OkHttpClient>() }
         val context = androidx.compose.ui.platform.LocalContext.current
-        
+
         val manager = remember { CEDICTManager(context, dictionaryRepository, okHttpClient) }
-        
+
         var isInstalled by remember { mutableStateOf(false) }
         var statusMessage by remember { mutableStateOf("") }
         var isDownloading by remember { mutableStateOf(false) }
@@ -50,7 +51,13 @@ object SettingsOCRScreen : SearchableSettings {
                 preferenceItems = persistentListOf(
                     Preference.PreferenceItem.TextPreference(
                         title = stringResource(MR.strings.pref_dictionary_title),
-                        subtitle = if (isDownloading) statusMessage else stringResource(MR.strings.pref_dictionary_summary),
+                        subtitle = if (isDownloading) {
+                            statusMessage
+                        } else {
+                            stringResource(
+                                MR.strings.pref_dictionary_summary,
+                            )
+                        },
                         onClick = {
                             if (!isDownloading) {
                                 scope.launch {
@@ -60,7 +67,10 @@ object SettingsOCRScreen : SearchableSettings {
                                             statusMessage = progress
                                         }
                                         isInstalled = true
-                                        statusMessage = context.getString(tachiyomi.i18n.MR.strings.pref_dictionary_installed.resourceId)
+                                        statusMessage =
+                                            context.getString(
+                                                tachiyomi.i18n.MR.strings.pref_dictionary_installed.resourceId,
+                                            )
                                     } catch (e: Exception) {
                                         statusMessage = "Error: ${e.message}"
                                     } finally {
@@ -73,7 +83,7 @@ object SettingsOCRScreen : SearchableSettings {
                     Preference.PreferenceItem.TextPreference(
                         title = "Status",
                         subtitle = statusMessage,
-                    )
+                    ),
                 ),
             ),
         )

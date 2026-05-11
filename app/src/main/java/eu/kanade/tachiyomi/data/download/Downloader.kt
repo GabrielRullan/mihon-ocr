@@ -1,6 +1,9 @@
 package eu.kanade.tachiyomi.data.download
 
 import android.content.Context
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.hippo.unifile.UniFile
 import eu.kanade.domain.chapter.model.toSChapter
 import eu.kanade.domain.manga.model.getComicInfo
@@ -8,6 +11,7 @@ import eu.kanade.tachiyomi.data.cache.ChapterCache
 import eu.kanade.tachiyomi.data.download.model.Download
 import eu.kanade.tachiyomi.data.library.LibraryUpdateNotifier
 import eu.kanade.tachiyomi.data.notification.NotificationHandler
+import eu.kanade.tachiyomi.data.ocr.OCRWorker
 import eu.kanade.tachiyomi.source.UnmeteredSource
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.online.HttpSource
@@ -59,10 +63,6 @@ import tachiyomi.domain.track.interactor.GetTracks
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import eu.kanade.tachiyomi.data.ocr.OCRWorker
 import java.io.File
 import java.util.Locale
 
@@ -420,14 +420,14 @@ class Downloader(
             DiskUtil.createNoMediaFile(tmpDir, context)
 
             download.status = Download.State.DOWNLOADED
-            
+
             // Trigger OCR Worker
             val chapterPath = if (downloadPreferences.saveChaptersAsCBZ.get()) {
                 mangaDir.findFile("$chapterDirname.cbz")?.uri?.path
             } else {
                 mangaDir.findFile(chapterDirname)?.uri?.path
             }
-            
+
             if (chapterPath != null) {
                 val ocrRequest = OneTimeWorkRequestBuilder<OCRWorker>()
                     .setInputData(Data.Builder().putString("chapter_path", chapterPath).build())

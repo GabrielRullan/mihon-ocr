@@ -1,6 +1,7 @@
 package eu.kanade.tachiyomi.data.ocr
 
 import android.content.Context
+import android.graphics.Rect
 import android.net.Uri
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
@@ -18,11 +19,14 @@ class OCRProcessor(private val context: Context) {
         return try {
             val result = recognizer.process(image).await()
             val textBlocks = result.textBlocks.map { block ->
+                val box = block.boundingBox
                 OCRBlock(
                     text = block.text,
-                    boundingBox = block.boundingBox?.let { 
-                        listOf(it.left, it.top, it.right, it.bottom) 
-                    } ?: emptyList()
+                    boundingBox = if (box != null) {
+                        listOf(box.left, box.top, box.right, box.bottom)
+                    } else {
+                        emptyList()
+                    },
                 )
             }
             OCRResultData(textBlocks)
@@ -34,11 +38,11 @@ class OCRProcessor(private val context: Context) {
 
 @Serializable
 data class OCRResultData(
-    val blocks: List<OCRBlock>
+    val blocks: List<OCRBlock>,
 )
 
 @Serializable
 data class OCRBlock(
     val text: String,
-    val boundingBox: List<Int>
+    val boundingBox: List<Int>,
 )

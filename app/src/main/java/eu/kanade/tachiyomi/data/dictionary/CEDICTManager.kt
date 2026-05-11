@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream
 class CEDICTManager(
     private val context: Context,
     private val repository: DictionaryRepository,
-    private val okHttpClient: OkHttpClient
+    private val okHttpClient: OkHttpClient,
 ) {
 
     private val cedictUrl = "https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.zip"
@@ -51,23 +51,25 @@ class CEDICTManager(
 
     private suspend fun parseAndImport() {
         repository.deleteAll()
-        
+
         val entries = mutableListOf<DictionaryEntry>()
         ZipInputStream(dictionaryFile.inputStream()).use { zip ->
             val entry = zip.nextEntry
             if (entry != null) {
                 val reader = zip.bufferedReader()
-                reader.forEachLine { line ->
-                    if (line.startsWith("#")) return@forEachLine
-                    
-                    val parsed = parseLine(line)
-                    if (parsed != null) {
-                        entries.add(parsed)
-                        if (entries.size >= 1000) {
-                            repository.addAll(entries.toList())
-                            entries.clear()
+                var line = reader.readLine()
+                while (line != null) {
+                    if (!line.startsWith("#")) {
+                        val parsed = parseLine(line)
+                        if (parsed != null) {
+                            entries.add(parsed)
+                            if (entries.size >= 1000) {
+                                repository.addAll(entries.toList())
+                                entries.clear()
+                            }
                         }
                     }
+                    line = reader.readLine()
                 }
             }
         }
@@ -82,14 +84,14 @@ class CEDICTManager(
             val parts = line.split(" ")
             val traditional = parts[0]
             val simplified = parts[1]
-            
+
             val pinyinStart = line.indexOf("[") + 1
             val pinyinEnd = line.indexOf("]")
             val pinyin = line.substring(pinyinStart, pinyinEnd)
-            
+
             val englishStart = line.indexOf("/")
             val english = line.substring(englishStart).trim('/')
-            
+
             return DictionaryEntry(0, simplified, traditional, pinyin, english)
         } catch (e: Exception) {
             return null

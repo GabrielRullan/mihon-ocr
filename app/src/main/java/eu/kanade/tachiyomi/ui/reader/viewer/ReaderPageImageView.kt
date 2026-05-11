@@ -36,12 +36,12 @@ import com.github.chrisbanes.photoview.PhotoView
 import eu.kanade.domain.base.BasePreferences
 import eu.kanade.tachiyomi.data.coil.cropBorders
 import eu.kanade.tachiyomi.data.coil.customDecoder
+import eu.kanade.tachiyomi.data.ocr.OCRResultData
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonSubsamplingImageView
 import eu.kanade.tachiyomi.util.system.animatorDurationScale
 import eu.kanade.tachiyomi.util.view.isVisibleOnScreen
 import okio.BufferedSource
 import tachiyomi.core.common.util.system.ImageUtil
-import eu.kanade.tachiyomi.data.ocr.OCRResultData
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 
@@ -61,6 +61,9 @@ open class ReaderPageImageView @JvmOverloads constructor(
     private val isWebtoon: Boolean = false,
 ) : FrameLayout(context, attrs, defStyleAttrs, defStyleRes) {
 
+    private var pageView: View? = null
+    private var ocrOverlay: OCROverlayView? = null
+
     init {
         ocrOverlay = OCROverlayView(context).apply {
             isVisible = false
@@ -72,9 +75,6 @@ open class ReaderPageImageView @JvmOverloads constructor(
     private val alwaysDecodeLongStripWithSSIV by lazy {
         Injekt.get<BasePreferences>().alwaysDecodeLongStripWithSSIV.get()
     }
-
-    private var pageView: View? = null
-    private var ocrOverlay: OCROverlayView? = null
 
     private var config: Config? = null
 

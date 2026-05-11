@@ -797,29 +797,33 @@ class ReaderViewModel @JvmOverloads constructor(
         viewModelScope.launchIO {
             mutableState.update { it.copy(dialog = Dialog.Loading) }
             val translation = translationProcessor.translate(block.text)
-            
-            // Simple word segmentation for dictionary lookup
-            // (In a real app, we'd use a segmenter, but for manhua simple matching is a start)
-            val dictionaryEntries = mutableListOf<tachiyomi.domain.dictionary.model.DictionaryEntry>()
-            
-            // Try to find words in the dictionary
-            // This is a naive implementation: check all substrings
-            // For manhua bubbles (usually short), this works surprisingly well
+
             val text = block.text
-            for (i in text.indices) {
-                for (j in i + 1..text.length) {
-                    val word = text.substring(i, j)
-                    dictionaryRepository.getEntryBySimplified(word)?.let {
-                        dictionaryEntries.add(it)
+            val dictionaryEntries = mutableListOf<tachiyomi.domain.dictionary.model.DictionaryEntry>()
+
+            // Forward Maximum Matching for better segmentation
+            var i = 0
+            val maxWordLength = 8
+            while (i < text.length) {
+                var found = false
+                for (len in minOf(maxWordLength, text.length - i) downTo 1) {
+                    val word = text.substring(i, i + len)
+                    // Skip common punctuation/spaces
+                    if (word.all { it.isWhitespace() || !it.isLetterOrDigit() }) continue
+
+                    val entry = dictionaryRepository.getEntryBySimplifiedOrTraditional(word)
+                    if (entry != null) {
+                        dictionaryEntries.add(entry)
+                        i += len
+                        found = true
+                        break
                     }
                 }
+                if (!found) i++
             }
-            // Sort by length descending to show longest matches first
-            val sortedEntries = dictionaryEntries.distinctBy { it.simplified }
-                .sortedByDescending { it.simplified.length }
 
-            mutableState.update { 
-                it.copy(dialog = Dialog.OCRTranslation(block.text, translation, sortedEntries))
+            mutableState.update {
+                it.copy(dialog = Dialog.OCRTranslation(block.text, translation, dictionaryEntries))
             }
         }
     }
@@ -1007,7 +1011,7 @@ class ReaderViewModel @JvmOverloads constructor(
         data object OrientationModeSelect : Dialog
         data class PageActions(val page: ReaderPage) : Dialog
         data class OCRTranslation(
-            val original: String, 
+            val original: String,
             val translation: String,
             val dictionaryEntries: List<tachiyomi.domain.dictionary.model.DictionaryEntry> = emptyList()
         ) : Dialog

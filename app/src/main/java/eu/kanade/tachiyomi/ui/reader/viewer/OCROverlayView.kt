@@ -14,7 +14,7 @@ import eu.kanade.tachiyomi.data.ocr.OCRResultData
 class OCROverlayView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
 
     private var ocrData: OCRResultData? = null
@@ -42,14 +42,14 @@ class OCROverlayView @JvmOverloads constructor(
         // Note: We need to handle scaling relative to the SubsamplingScaleImageView
         // For simplicity in this prototype, we'll draw based on the raw coordinates
         // and assume the user will handle zoom/pan adjustments later.
-        
+
         data.blocks.forEach { block ->
             if (block.boundingBox.size == 4) {
                 val rect = Rect(
                     block.boundingBox[0],
                     block.boundingBox[1],
                     block.boundingBox[2],
-                    block.boundingBox[3]
+                    block.boundingBox[3],
                 )
                 canvas.drawRect(rect, paint)
                 canvas.drawRect(rect, borderPaint)
@@ -66,7 +66,7 @@ class OCROverlayView @JvmOverloads constructor(
                         block.boundingBox[0],
                         block.boundingBox[1],
                         block.boundingBox[2],
-                        block.boundingBox[3]
+                        block.boundingBox[3],
                     )
                     if (rect.contains(event.x.toInt(), event.y.toInt())) {
                         onBlockTapped?.invoke(block)

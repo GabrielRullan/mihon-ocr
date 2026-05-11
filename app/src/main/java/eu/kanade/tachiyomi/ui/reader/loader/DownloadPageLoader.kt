@@ -60,7 +60,7 @@ internal class DownloadPageLoader(
 
     private fun getPagesFromDirectory(): List<ReaderPage> {
         val pages = downloadManager.buildPageList(source, manga, chapter.chapter.toDomainChapter()!!)
-        
+
         // Load OCR data
         val dbChapter = chapter.chapter
         val chapterDir = downloadProvider.findChapterDir(dbChapter.name, dbChapter.scanlator, dbChapter.url, manga.title, source)
