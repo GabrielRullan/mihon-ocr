@@ -63,6 +63,7 @@ class PagerPageHolder(
     private var loadJob: Job? = null
 
     init {
+        onBlockTapped = { viewer.activity.viewModel.translateOCR(it) }
         loadJob = scope.launch { loadPageAndProcessStatus() }
     }
 
@@ -172,6 +173,7 @@ class PagerPageHolder(
                         landscapeZoom = viewer.config.landscapeZoom,
                     ),
                 )
+                setOcrData(page.ocrData)
                 if (!isAnimated) {
                     pageBackground = background
                 }

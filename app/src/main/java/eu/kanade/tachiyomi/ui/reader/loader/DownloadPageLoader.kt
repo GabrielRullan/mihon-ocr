@@ -11,6 +11,7 @@ import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import mihon.core.archive.archiveReader
+import kotlinx.serialization.json.Json
 import tachiyomi.domain.manga.model.Manga
 import uy.kohesive.injekt.injectLazy
 
@@ -59,11 +60,28 @@ internal class DownloadPageLoader(
 
     private fun getPagesFromDirectory(): List<ReaderPage> {
         val pages = downloadManager.buildPageList(source, manga, chapter.chapter.toDomainChapter()!!)
+        
+        // Load OCR data
+        val dbChapter = chapter.chapter
+        val chapterDir = downloadProvider.findChapterDir(dbChapter.name, dbChapter.scanlator, dbChapter.url, manga.title, source)
+        val ocrFile = chapterDir?.findFile("ocr_results.json")
+        val ocrResults = ocrFile?.let { file ->
+            try {
+                val json = file.openInputStream().bufferedReader().use { it.readText() }
+                kotlinx.serialization.json.Json.decodeFromString<Map<String, eu.kanade.tachiyomi.data.ocr.OCRResultData>>(json)
+            } catch (e: Exception) {
+                null
+            }
+        }
+
         return pages.map { page ->
             ReaderPage(page.index, page.url, page.imageUrl) {
                 context.contentResolver.openInputStream(page.uri ?: Uri.EMPTY)!!
             }.apply {
                 status = Page.State.Ready
+                // Match by filename
+                val filename = page.uri?.lastPathSegment
+                ocrData = ocrResults?.get(filename)
             }
         }
     }

@@ -11,4 +11,5 @@ open class ReaderPage(
 ) : Page(index, url, imageUrl, null) {
 
     open lateinit var chapter: ReaderChapter
+    var ocrData: eu.kanade.tachiyomi.data.ocr.OCRResultData? = null
 }

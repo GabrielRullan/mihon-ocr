@@ -46,6 +46,7 @@ import tachiyomi.data.source.SourceRepositoryImpl
 import tachiyomi.data.source.StubSourceRepositoryImpl
 import tachiyomi.data.track.TrackRepositoryImpl
 import tachiyomi.data.updates.UpdatesRepositoryImpl
+import tachiyomi.data.dictionary.DictionaryRepositoryImpl
 import tachiyomi.domain.category.interactor.CreateCategoryWithName
 import tachiyomi.domain.category.interactor.DeleteCategory
 import tachiyomi.domain.category.interactor.GetCategories
@@ -65,6 +66,7 @@ import tachiyomi.domain.chapter.interactor.SetMangaDefaultChapterFlags
 import tachiyomi.domain.chapter.interactor.ShouldUpdateDbChapter
 import tachiyomi.domain.chapter.interactor.UpdateChapter
 import tachiyomi.domain.chapter.repository.ChapterRepository
+import tachiyomi.domain.dictionary.repository.DictionaryRepository
 import tachiyomi.domain.history.interactor.GetHistory
 import tachiyomi.domain.history.interactor.GetNextChapters
 import tachiyomi.domain.history.interactor.GetTotalReadDuration
@@ -183,6 +185,7 @@ class DomainModule : InjektModule {
         addFactory { GetUpdates(get()) }
 
         addSingletonFactory<SourceRepository> { SourceRepositoryImpl(get(), get()) }
+        addSingletonFactory<DictionaryRepository> { DictionaryRepositoryImpl(get()) }
         addSingletonFactory<StubSourceRepository> { StubSourceRepositoryImpl(get()) }
         addFactory { GetEnabledSources(get(), get()) }
         addFactory { GetLanguagesWithSources(get(), get()) }

@@ -41,6 +41,8 @@ image-decoder = "e03b81e18a"
 injekt = "91edab2317"
 jsoup = "1.22.2"
 junit = "6.0.3"
+mlkit-text-chinese = "16.0.0"
+mlkit-translate = "17.0.3"
 kotest-assertions = "6.1.11"
 kotlin-gradle = "2.3.21"
 kotlinx-collections-immutable = "0.4.0"
@@ -152,6 +154,8 @@ markdown-coil = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3",
 markdown-core = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdown" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
+mlkit-text-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "mlkit-text-chinese" }
+mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "mlkit-translate" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 moko-resources = { module = "dev.icerock.moko:resources", version.ref = "moko-resources" }
 natural-comparator = { module = "com.github.gpanther:java-nat-sort", version = "natural-comparator-1.1" }

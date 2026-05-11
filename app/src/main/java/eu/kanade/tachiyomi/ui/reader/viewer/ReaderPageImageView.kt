@@ -41,6 +41,7 @@ import eu.kanade.tachiyomi.util.system.animatorDurationScale
 import eu.kanade.tachiyomi.util.view.isVisibleOnScreen
 import okio.BufferedSource
 import tachiyomi.core.common.util.system.ImageUtil
+import eu.kanade.tachiyomi.data.ocr.OCRResultData
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 
@@ -60,11 +61,20 @@ open class ReaderPageImageView @JvmOverloads constructor(
     private val isWebtoon: Boolean = false,
 ) : FrameLayout(context, attrs, defStyleAttrs, defStyleRes) {
 
+    init {
+        ocrOverlay = OCROverlayView(context).apply {
+            isVisible = false
+            onBlockTapped = { this@ReaderPageImageView.onBlockTapped?.invoke(it) }
+        }
+        addView(ocrOverlay, MATCH_PARENT, MATCH_PARENT)
+    }
+
     private val alwaysDecodeLongStripWithSSIV by lazy {
         Injekt.get<BasePreferences>().alwaysDecodeLongStripWithSSIV.get()
     }
 
     private var pageView: View? = null
+    private var ocrOverlay: OCROverlayView? = null
 
     private var config: Config? = null
 
@@ -72,6 +82,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
     var onImageLoadError: ((Throwable?) -> Unit)? = null
     var onScaleChanged: ((newScale: Float) -> Unit)? = null
     var onViewClicked: (() -> Unit)? = null
+    var onBlockTapped: ((eu.kanade.tachiyomi.data.ocr.OCRBlock) -> Unit)? = null
 
     /**
      * For automatic background. Will be set as background color when [onImageLoaded] is called.
@@ -97,6 +108,11 @@ open class ReaderPageImageView @JvmOverloads constructor(
     @CallSuper
     open fun onViewClicked() {
         onViewClicked?.invoke()
+    }
+
+    fun setOcrData(data: OCRResultData?) {
+        ocrOverlay?.setOcrData(data)
+        ocrOverlay?.isVisible = data != null
     }
 
     open fun onPageSelected(forward: Boolean) {

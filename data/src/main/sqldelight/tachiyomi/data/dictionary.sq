@@ -1,0 +1,25 @@
+CREATE TABLE dictionary (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    simplified TEXT NOT NULL,
+    traditional TEXT NOT NULL,
+    pinyin TEXT NOT NULL,
+    english TEXT NOT NULL
+);
+
+CREATE INDEX dictionary_simplified_index ON dictionary(simplified);
+
+getEntryBySimplified:
+SELECT * FROM dictionary WHERE simplified = ?;
+
+getEntriesBySimplifiedList:
+SELECT * FROM dictionary WHERE simplified IN ?;
+
+insert:
+INSERT INTO dictionary (simplified, traditional, pinyin, english)
+VALUES (?, ?, ?, ?);
+
+deleteAll:
+DELETE FROM dictionary;
+
+count:
+SELECT COUNT(*) FROM dictionary;

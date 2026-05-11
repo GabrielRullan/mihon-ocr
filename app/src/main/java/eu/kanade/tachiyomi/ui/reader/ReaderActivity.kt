@@ -36,6 +36,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.core.content.getSystemService
 import androidx.core.graphics.Insets
 import androidx.core.net.toUri
@@ -326,6 +330,52 @@ class ReaderActivity : BaseActivity() {
                     onSetAsCover = viewModel::setAsCover,
                     onShare = viewModel::shareImage,
                     onSave = viewModel::saveImage,
+                )
+            }
+            is ReaderViewModel.Dialog.OCRTranslation -> {
+                AlertDialog(
+                    onDismissRequest = onDismissRequest,
+                    confirmButton = {
+                        androidx.compose.material3.TextButton(onClick = onDismissRequest) {
+                            Text(stringResource(MR.strings.action_ok))
+                        }
+                    },
+                    title = { Text("Translation") },
+                    text = {
+                        val ocrDialog = state.dialog as ReaderViewModel.Dialog.OCRTranslation
+                        androidx.compose.foundation.lazy.LazyColumn {
+                            item {
+                                Text(text = "Original", style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
+                                Text(text = ocrDialog.original, style = androidx.compose.material3.MaterialTheme.typography.bodyLarge)
+                                androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(16.dp))
+                                
+                                Text(text = "Deep Translation", style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
+                                Text(text = ocrDialog.translation, style = androidx.compose.material3.MaterialTheme.typography.titleMedium, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+                                androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(16.dp))
+                                
+                                if (ocrDialog.dictionaryEntries.isNotEmpty()) {
+                                    Text(text = "Dictionary Breakdown", style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
+                                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
+                            items(ocrDialog.dictionaryEntries) { entry ->
+                                androidx.compose.material3.Card(
+                                    modifier = Modifier.padding(vertical = 4.dp),
+                                    colors = androidx.compose.material3.CardDefaults.cardColors(
+                                        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                    )
+                                ) {
+                                    androidx.compose.foundation.layout.Column(modifier = Modifier.padding(8.dp)) {
+                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            Text(text = entry.simplified, style = androidx.compose.material3.MaterialTheme.typography.bodyLarge, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                                            Text(text = entry.pinyin, style = androidx.compose.material3.MaterialTheme.typography.bodyMedium, color = androidx.compose.material3.MaterialTheme.colorScheme.secondary)
+                                        }
+                                        Text(text = entry.english, style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
+                                    }
+                                }
+                            }
+                        }
+                    },
                 )
             }
             null -> {}

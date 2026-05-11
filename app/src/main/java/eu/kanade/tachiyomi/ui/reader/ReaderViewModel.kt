@@ -101,6 +101,8 @@ class ReaderViewModel @JvmOverloads constructor(
     private val setMangaViewerFlags: SetMangaViewerFlags = Injekt.get(),
     private val getIncognitoState: GetIncognitoState = Injekt.get(),
     private val libraryPreferences: LibraryPreferences = Injekt.get(),
+    private val translationProcessor: eu.kanade.tachiyomi.data.ocr.TranslationProcessor = eu.kanade.tachiyomi.data.ocr.TranslationProcessor(),
+    private val dictionaryRepository: tachiyomi.domain.dictionary.repository.DictionaryRepository = Injekt.get(),
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow(State())
@@ -791,6 +793,37 @@ class ReaderViewModel @JvmOverloads constructor(
         mutableState.update { it.copy(brightnessOverlayValue = value) }
     }
 
+    fun translateOCR(block: eu.kanade.tachiyomi.data.ocr.OCRBlock) {
+        viewModelScope.launchIO {
+            mutableState.update { it.copy(dialog = Dialog.Loading) }
+            val translation = translationProcessor.translate(block.text)
+            
+            // Simple word segmentation for dictionary lookup
+            // (In a real app, we'd use a segmenter, but for manhua simple matching is a start)
+            val dictionaryEntries = mutableListOf<tachiyomi.domain.dictionary.model.DictionaryEntry>()
+            
+            // Try to find words in the dictionary
+            // This is a naive implementation: check all substrings
+            // For manhua bubbles (usually short), this works surprisingly well
+            val text = block.text
+            for (i in text.indices) {
+                for (j in i + 1..text.length) {
+                    val word = text.substring(i, j)
+                    dictionaryRepository.getEntryBySimplified(word)?.let {
+                        dictionaryEntries.add(it)
+                    }
+                }
+            }
+            // Sort by length descending to show longest matches first
+            val sortedEntries = dictionaryEntries.distinctBy { it.simplified }
+                .sortedByDescending { it.simplified.length }
+
+            mutableState.update { 
+                it.copy(dialog = Dialog.OCRTranslation(block.text, translation, sortedEntries))
+            }
+        }
+    }
+
     /**
      * Saves the image of the selected page on the pictures directory and notifies the UI of the result.
      * There's also a notification to allow sharing the image somewhere else or deleting it.
@@ -973,6 +1006,11 @@ class ReaderViewModel @JvmOverloads constructor(
         data object ReadingModeSelect : Dialog
         data object OrientationModeSelect : Dialog
         data class PageActions(val page: ReaderPage) : Dialog
+        data class OCRTranslation(
+            val original: String, 
+            val translation: String,
+            val dictionaryEntries: List<tachiyomi.domain.dictionary.model.DictionaryEntry> = emptyList()
+        ) : Dialog
     }
 
     sealed interface Event {

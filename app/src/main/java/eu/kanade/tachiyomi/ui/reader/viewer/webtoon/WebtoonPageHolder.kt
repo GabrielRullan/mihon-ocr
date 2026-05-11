@@ -86,6 +86,7 @@ class WebtoonPageHolder(
         frame.onImageLoaded = { onImageDecoded() }
         frame.onImageLoadError = { error -> setError(error) }
         frame.onScaleChanged = { viewer.activity.hideMenu() }
+        frame.onBlockTapped = { viewer.activity.viewModel.translateOCR(it) }
     }
 
     /**
@@ -205,6 +206,7 @@ class WebtoonPageHolder(
                         cropBorders = viewer.config.imageCropBorders,
                     ),
                 )
+                frame.setOcrData(page?.ocrData)
                 removeErrorLayout()
             }
         } catch (e: Throwable) {

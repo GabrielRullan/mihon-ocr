@@ -59,6 +59,10 @@ import tachiyomi.domain.track.interactor.GetTracks
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import eu.kanade.tachiyomi.data.ocr.OCRWorker
 import java.io.File
 import java.util.Locale
 
@@ -416,6 +420,20 @@ class Downloader(
             DiskUtil.createNoMediaFile(tmpDir, context)
 
             download.status = Download.State.DOWNLOADED
+            
+            // Trigger OCR Worker
+            val chapterPath = if (downloadPreferences.saveChaptersAsCBZ.get()) {
+                mangaDir.findFile("$chapterDirname.cbz")?.uri?.path
+            } else {
+                mangaDir.findFile(chapterDirname)?.uri?.path
+            }
+            
+            if (chapterPath != null) {
+                val ocrRequest = OneTimeWorkRequestBuilder<OCRWorker>()
+                    .setInputData(Data.Builder().putString("chapter_path", chapterPath).build())
+                    .build()
+                WorkManager.getInstance(context).enqueue(ocrRequest)
+            }
         } catch (error: Throwable) {
             if (error is CancellationException) throw error
             // If the page list threw, it will resume here

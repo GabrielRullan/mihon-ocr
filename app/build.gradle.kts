@@ -279,6 +279,10 @@ dependencies {
     // String similarity
     implementation(libs.stringSimilarity)
 
+    // OCR
+    implementation(libs.mlkit.text.chinese)
+    implementation(libs.mlkit.translate)
+
     // Tests
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.platform.launcher)
