@@ -32,6 +32,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
@@ -44,10 +46,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.core.content.getSystemService
 import androidx.core.graphics.Insets
 import androidx.core.net.toUri
@@ -351,22 +349,39 @@ class ReaderActivity : BaseActivity() {
                     title = { Text("Translation") },
                     text = {
                         val ocrDialog = state.dialog as ReaderViewModel.Dialog.OCRTranslation
-                        val ankiManager = remember { uy.kohesive.injekt.Injekt.get<eu.kanade.tachiyomi.data.anki.AnkiManager>() }
+                        val ankiManager =
+                            remember { uy.kohesive.injekt.Injekt.get<eu.kanade.tachiyomi.data.anki.AnkiManager>() }
                         val scope = androidx.compose.runtime.rememberCoroutineScope()
                         val context = androidx.compose.ui.platform.LocalContext.current
 
                         androidx.compose.foundation.lazy.LazyColumn {
                             item {
-                                Text(text = "Original", style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
-                                Text(text = ocrDialog.original, style = androidx.compose.material3.MaterialTheme.typography.bodyLarge)
+                                Text(
+                                    text = "Original",
+                                    style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                                )
+                                Text(
+                                    text = ocrDialog.original,
+                                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                                )
                                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(16.dp))
 
-                                Text(text = "Deep Translation", style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
-                                Text(text = ocrDialog.translation, style = androidx.compose.material3.MaterialTheme.typography.titleMedium, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+                                Text(
+                                    text = "Deep Translation",
+                                    style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                                )
+                                Text(
+                                    text = ocrDialog.translation,
+                                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                )
                                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(16.dp))
 
                                 if (ocrDialog.dictionaryEntries.isNotEmpty()) {
-                                    Text(text = "Dictionary Breakdown", style = androidx.compose.material3.MaterialTheme.typography.labelSmall)
+                                    Text(
+                                        text = "Dictionary Breakdown",
+                                        style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                                    )
                                     androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
                                 }
                             }
@@ -374,8 +389,9 @@ class ReaderActivity : BaseActivity() {
                                 androidx.compose.material3.Card(
                                     modifier = Modifier.padding(vertical = 4.dp),
                                     colors = androidx.compose.material3.CardDefaults.cardColors(
-                                        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                                    )
+                                        containerColor = androidx.compose.material3.MaterialTheme.colorScheme
+                                            .surfaceVariant.copy(alpha = 0.5f),
+                                    ),
                                 ) {
                                     androidx.compose.foundation.layout.Column(modifier = Modifier.padding(8.dp)) {
                                         Row(
@@ -391,8 +407,9 @@ class ReaderActivity : BaseActivity() {
                                                 }
                                                 Text(
                                                     text = displayText,
-                                                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                                                    style = androidx.compose.material3.MaterialTheme.typography
+                                                        .bodyLarge,
+                                                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                                                 )
 
                                                 // Colored Pinyin
@@ -400,16 +417,27 @@ class ReaderActivity : BaseActivity() {
                                                 Row {
                                                     pinyinParts.forEach { part ->
                                                         val color = when {
-                                                            part.contains("1") -> androidx.compose.ui.graphics.Color(0xFFF44336)
-                                                            part.contains("2") -> androidx.compose.ui.graphics.Color(0xFFFF9800)
-                                                            part.contains("3") -> androidx.compose.ui.graphics.Color(0xFF4CAF50)
-                                                            part.contains("4") -> androidx.compose.ui.graphics.Color(0xFF2196F3)
-                                                            else -> androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                                                            part.contains("1") -> androidx.compose.ui.graphics.Color(
+                                                                0xFFF44336,
+                                                            )
+                                                            part.contains("2") -> androidx.compose.ui.graphics.Color(
+                                                                0xFFFF9800,
+                                                            )
+                                                            part.contains("3") -> androidx.compose.ui.graphics.Color(
+                                                                0xFF4CAF50,
+                                                            )
+                                                            part.contains("4") -> androidx.compose.ui.graphics.Color(
+                                                                0xFF2196F3,
+                                                            )
+                                                            else ->
+                                                                androidx.compose.material3.MaterialTheme.colorScheme
+                                                                    .onSurfaceVariant
                                                         }
                                                         Text(
                                                             text = part + " ",
-                                                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                                                            color = color
+                                                            style = androidx.compose.material3.MaterialTheme.typography
+                                                                .bodyMedium,
+                                                            color = color,
                                                         )
                                                     }
                                                 }
@@ -435,16 +463,19 @@ class ReaderActivity : BaseActivity() {
                                                         }
                                                     }
                                                 },
-                                                modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(24.dp),
                                             ) {
                                                 androidx.compose.material3.Icon(
                                                     imageVector = Icons.Default.Add,
                                                     contentDescription = "Add to Anki",
-                                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                                                 )
                                             }
                                         }
-                                        Text(text = entry.english, style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
+                                        Text(
+                                            text = entry.english,
+                                            style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                                        )
                                     }
                                 }
                             }

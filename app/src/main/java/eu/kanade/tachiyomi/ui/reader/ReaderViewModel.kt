@@ -19,6 +19,7 @@ import eu.kanade.tachiyomi.data.database.models.toDomainChapter
 import eu.kanade.tachiyomi.data.download.DownloadManager
 import eu.kanade.tachiyomi.data.download.DownloadProvider
 import eu.kanade.tachiyomi.data.download.model.Download
+import eu.kanade.tachiyomi.data.ocr.TranslationProcessor
 import eu.kanade.tachiyomi.data.saver.Image
 import eu.kanade.tachiyomi.data.saver.ImageSaver
 import eu.kanade.tachiyomi.data.saver.Location
@@ -65,6 +66,7 @@ import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
 import tachiyomi.domain.chapter.interactor.UpdateChapter
 import tachiyomi.domain.chapter.model.ChapterUpdate
 import tachiyomi.domain.chapter.service.getChapterSort
+import tachiyomi.domain.dictionary.repository.DictionaryRepository
 import tachiyomi.domain.download.service.DownloadPreferences
 import tachiyomi.domain.history.interactor.GetNextChapters
 import tachiyomi.domain.history.interactor.UpsertHistory
@@ -101,8 +103,8 @@ class ReaderViewModel @JvmOverloads constructor(
     private val setMangaViewerFlags: SetMangaViewerFlags = Injekt.get(),
     private val getIncognitoState: GetIncognitoState = Injekt.get(),
     private val libraryPreferences: LibraryPreferences = Injekt.get(),
-    private val translationProcessor: eu.kanade.tachiyomi.data.ocr.TranslationProcessor = eu.kanade.tachiyomi.data.ocr.TranslationProcessor(),
-    private val dictionaryRepository: tachiyomi.domain.dictionary.repository.DictionaryRepository = Injekt.get(),
+    private val translationProcessor: TranslationProcessor = TranslationProcessor(),
+    private val dictionaryRepository: DictionaryRepository = Injekt.get(),
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow(State())
@@ -1013,7 +1015,7 @@ class ReaderViewModel @JvmOverloads constructor(
         data class OCRTranslation(
             val original: String,
             val translation: String,
-            val dictionaryEntries: List<tachiyomi.domain.dictionary.model.DictionaryEntry> = emptyList()
+            val dictionaryEntries: List<tachiyomi.domain.dictionary.model.DictionaryEntry> = emptyList(),
         ) : Dialog
     }
 
