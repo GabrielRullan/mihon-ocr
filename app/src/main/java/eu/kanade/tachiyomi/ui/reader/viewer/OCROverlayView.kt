@@ -18,6 +18,8 @@ class OCROverlayView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private var ocrData: OCRResultData? = null
+    private var imageView: com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView? = null
+
     private val paint = Paint().apply {
         color = Color.parseColor("#4000F2FE") // Semi-transparent cyan
         style = Paint.Style.FILL
@@ -30,29 +32,26 @@ class OCROverlayView @JvmOverloads constructor(
 
     var onBlockTapped: ((OCRBlock) -> Unit)? = null
 
-    fun setOcrData(data: OCRResultData?) {
+    fun setOcrData(data: OCRResultData?, view: com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView? = null) {
         ocrData = data
+        imageView = view
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val data = ocrData ?: return
-
-        // Note: We need to handle scaling relative to the SubsamplingScaleImageView
-        // For simplicity in this prototype, we'll draw based on the raw coordinates
-        // and assume the user will handle zoom/pan adjustments later.
+        val view = imageView ?: return
 
         data.blocks.forEach { block ->
             if (block.boundingBox.size == 4) {
-                val rect = Rect(
-                    block.boundingBox[0],
-                    block.boundingBox[1],
-                    block.boundingBox[2],
-                    block.boundingBox[3],
-                )
-                canvas.drawRect(rect, paint)
-                canvas.drawRect(rect, borderPaint)
+                val leftTop = view.sourceToViewCoord(block.boundingBox[0].toFloat(), block.boundingBox[1].toFloat())
+                val rightBottom = view.sourceToViewCoord(block.boundingBox[2].toFloat(), block.boundingBox[3].toFloat())
+
+                if (leftTop != null && rightBottom != null) {
+                    canvas.drawRect(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, paint)
+                    canvas.drawRect(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, borderPaint)
+                }
             }
         }
     }
@@ -60,17 +59,19 @@ class OCROverlayView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_UP) {
             val data = ocrData ?: return false
+            val view = imageView ?: return false
+
             data.blocks.forEach { block ->
                 if (block.boundingBox.size == 4) {
-                    val rect = Rect(
-                        block.boundingBox[0],
-                        block.boundingBox[1],
-                        block.boundingBox[2],
-                        block.boundingBox[3],
-                    )
-                    if (rect.contains(event.x.toInt(), event.y.toInt())) {
-                        onBlockTapped?.invoke(block)
-                        return true
+                    val leftTop = view.sourceToViewCoord(block.boundingBox[0].toFloat(), block.boundingBox[1].toFloat())
+                    val rightBottom = view.sourceToViewCoord(block.boundingBox[2].toFloat(), block.boundingBox[3].toFloat())
+
+                    if (leftTop != null && rightBottom != null) {
+                        val rect = android.graphics.RectF(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y)
+                        if (rect.contains(event.x, event.y)) {
+                            onBlockTapped?.invoke(block)
+                            return true
+                        }
                     }
                 }
             }

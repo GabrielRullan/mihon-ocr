@@ -13,7 +13,7 @@ class TranslationProcessor {
         .setTargetLanguage(TranslateLanguage.ENGLISH)
         .build()
 
-    private val translator = Translation.getClient(options)
+    private val translator by lazy { Translation.getClient(options) }
 
     suspend fun translate(text: String): String {
         return try {

@@ -28,6 +28,8 @@ import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 
 /**
  * View of the ViewPager that contains a page of a chapter.
@@ -173,7 +175,24 @@ class PagerPageHolder(
                         landscapeZoom = viewer.config.landscapeZoom,
                     ),
                 )
-                setOcrData(page.ocrData)
+                setOcrData(page.ocrData, viewer.config.ocrEnabled)
+                if (page.ocrData == null && viewer.config.ocrEnabled) {
+                    scope.launchIO {
+                        try {
+                            val ocrProcessor = Injekt.get<eu.kanade.tachiyomi.data.ocr.OCRProcessor>()
+                            val bitmap = streamFn().use { android.graphics.BitmapFactory.decodeStream(it) }
+                            if (bitmap != null) {
+                                val data = ocrProcessor.processImage(bitmap)
+                                page.ocrData = data
+                                withUIContext {
+                                    setOcrData(data, viewer.config.ocrEnabled)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            logcat(LogPriority.ERROR, e)
+                        }
+                    }
+                }
                 if (!isAnimated) {
                     pageBackground = background
                 }

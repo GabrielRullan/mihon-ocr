@@ -123,6 +123,9 @@ class AppModule(val app: Application) : InjektModule {
 
         addSingletonFactory { AnkiManager(app) }
 
+        addSingletonFactory { eu.kanade.tachiyomi.data.ocr.OCRProcessor(app) }
+        addSingletonFactory { eu.kanade.tachiyomi.data.ocr.TranslationProcessor() }
+
         addSingletonFactory { AndroidStorageFolderProvider(app) }
         addSingletonFactory { LocalSourceFileSystem(get()) }
         addSingletonFactory { LocalCoverManager(app, get()) }

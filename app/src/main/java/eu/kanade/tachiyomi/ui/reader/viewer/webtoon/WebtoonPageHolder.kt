@@ -33,6 +33,8 @@ import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 
 /**
  * Holder of the webtoon reader for a single page of a chapter.
@@ -202,11 +204,28 @@ class WebtoonPageHolder(
                     isAnimated,
                     ReaderPageImageView.Config(
                         zoomDuration = viewer.config.doubleTapAnimDuration,
-                        minimumScaleType = SubsamplingScaleImageView.SCALE_TYPE_FIT_WIDTH,
+                        minimumScaleType = com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.SCALE_TYPE_FIT_WIDTH,
                         cropBorders = viewer.config.imageCropBorders,
                     ),
                 )
-                frame.setOcrData(page?.ocrData)
+                frame.setOcrData(page?.ocrData, viewer.config.ocrEnabled)
+                if (page?.ocrData == null && viewer.config.ocrEnabled) {
+                    scope.launchIO {
+                        try {
+                            val ocrProcessor = Injekt.get<eu.kanade.tachiyomi.data.ocr.OCRProcessor>()
+                            val bitmap = streamFn().use { android.graphics.BitmapFactory.decodeStream(it) }
+                            if (bitmap != null) {
+                                val data = ocrProcessor.processImage(bitmap)
+                                page?.ocrData = data
+                                withUIContext {
+                                    frame.setOcrData(data, viewer.config.ocrEnabled)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            logcat(logcat.LogPriority.ERROR, e)
+                        }
+                    }
+                }
                 removeErrorLayout()
             }
         } catch (e: Throwable) {

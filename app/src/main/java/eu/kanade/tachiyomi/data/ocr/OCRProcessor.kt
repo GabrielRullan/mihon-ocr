@@ -1,6 +1,7 @@
 package eu.kanade.tachiyomi.data.ocr
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Rect
 import android.net.Uri
 import com.google.mlkit.vision.common.InputImage
@@ -15,7 +16,24 @@ class OCRProcessor(private val context: Context) {
     private val recognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
 
     suspend fun processImage(file: File): OCRResultData? {
-        val image = InputImage.fromFilePath(context, Uri.fromFile(file))
+        return processImage(Uri.fromFile(file))
+    }
+
+    suspend fun processImage(uri: Uri): OCRResultData? {
+        val image = try {
+            InputImage.fromFilePath(context, uri)
+        } catch (e: Exception) {
+            return null
+        }
+        return process(image)
+    }
+
+    suspend fun processImage(bitmap: Bitmap): OCRResultData? {
+        val image = InputImage.fromBitmap(bitmap, 0)
+        return process(image)
+    }
+
+    private suspend fun process(image: InputImage): OCRResultData? {
         return try {
             val result = recognizer.process(image).await()
             val textBlocks = result.textBlocks.map { block ->

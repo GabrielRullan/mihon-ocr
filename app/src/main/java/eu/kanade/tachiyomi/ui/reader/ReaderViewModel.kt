@@ -103,7 +103,7 @@ class ReaderViewModel @JvmOverloads constructor(
     private val setMangaViewerFlags: SetMangaViewerFlags = Injekt.get(),
     private val getIncognitoState: GetIncognitoState = Injekt.get(),
     private val libraryPreferences: LibraryPreferences = Injekt.get(),
-    private val translationProcessor: TranslationProcessor = TranslationProcessor(),
+    private val translationProcessor: TranslationProcessor = Injekt.get(),
     private val dictionaryRepository: DictionaryRepository = Injekt.get(),
 ) : ViewModel() {
 

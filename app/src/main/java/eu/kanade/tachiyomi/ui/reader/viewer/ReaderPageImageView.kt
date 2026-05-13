@@ -110,9 +110,9 @@ open class ReaderPageImageView @JvmOverloads constructor(
         onViewClicked?.invoke()
     }
 
-    fun setOcrData(data: OCRResultData?) {
-        ocrOverlay?.setOcrData(data)
-        ocrOverlay?.isVisible = data != null
+    fun setOcrData(data: OCRResultData?, enabled: Boolean = true) {
+        ocrOverlay?.setOcrData(data, pageView as? com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView)
+        ocrOverlay?.isVisible = data != null && enabled
     }
 
     open fun onPageSelected(forward: Boolean) {
@@ -264,10 +264,11 @@ open class ReaderPageImageView @JvmOverloads constructor(
                 object : SubsamplingScaleImageView.OnStateChangedListener {
                     override fun onScaleChanged(newScale: Float, origin: Int) {
                         this@ReaderPageImageView.onScaleChanged(newScale)
+                        ocrOverlay?.invalidate()
                     }
-
+ 
                     override fun onCenterChanged(newCenter: PointF?, origin: Int) {
-                        // Not used
+                        ocrOverlay?.invalidate()
                     }
                 },
             )

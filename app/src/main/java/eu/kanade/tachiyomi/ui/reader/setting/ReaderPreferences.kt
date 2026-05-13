@@ -136,6 +136,12 @@ class ReaderPreferences(
 
     // endregion
 
+    // region OCR
+
+    val ocrEnabled: Preference<Boolean> = preferenceStore.getBoolean("pref_ocr_mode_key", false)
+
+    // endregion
+
     // region Controls
 
     val readWithLongTap: Preference<Boolean> = preferenceStore.getBoolean("reader_long_tap", true)

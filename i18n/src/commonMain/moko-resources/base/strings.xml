@@ -225,6 +225,8 @@
     <string name="pref_security_summary">App lock, secure screen</string>
     <string name="pref_advanced_summary">Dump crash logs, battery optimizations</string>
     <string name="pref_ocr_summary">Offline OCR, translation, and dictionaries</string>
+    <string name="pref_ocr_mode">OCR Mode</string>
+    <string name="pref_ocr_mode_summary">Enable text recognition and translation on pages</string>
 
     <string name="pref_dictionary_title">CC-CEDICT Dictionary</string>
     <string name="pref_dictionary_summary">Download offline dictionary for word-by-word lookup</string>
