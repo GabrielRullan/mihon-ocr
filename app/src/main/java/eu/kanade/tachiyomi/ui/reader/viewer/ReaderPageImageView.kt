@@ -115,6 +115,21 @@ open class ReaderPageImageView @JvmOverloads constructor(
         ocrOverlay?.isVisible = data != null && enabled
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        var handled = false
+        if (ev.action == MotionEvent.ACTION_UP && ocrOverlay?.isVisible == true) {
+            handled = ocrOverlay?.checkBlockTap(ev.x, ev.y) == true
+        }
+        if (handled) {
+            val cancelEvent = MotionEvent.obtain(ev)
+            cancelEvent.action = MotionEvent.ACTION_CANCEL
+            super.dispatchTouchEvent(cancelEvent)
+            cancelEvent.recycle()
+            return true
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
     open fun onPageSelected(forward: Boolean) {
         with(pageView as? SubsamplingScaleImageView) {
             if (this == null) return
@@ -274,7 +289,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
             )
             setOnClickListener { this@ReaderPageImageView.onViewClicked() }
         }
-        addView(pageView, MATCH_PARENT, MATCH_PARENT)
+        addView(pageView, 0, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
     }
 
     private fun SubsamplingScaleImageView.setupZoom(config: Config?) {
@@ -391,7 +406,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
                 }
             }
         }
-        addView(pageView, MATCH_PARENT, MATCH_PARENT)
+        addView(pageView, 0, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
     }
 
     private fun setAnimatedImage(

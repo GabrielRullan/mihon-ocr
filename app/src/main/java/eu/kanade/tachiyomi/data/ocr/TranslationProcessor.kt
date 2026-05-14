@@ -6,14 +6,22 @@ import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 import kotlinx.coroutines.tasks.await
 
-class TranslationProcessor {
+import android.content.Context
+
+class TranslationProcessor(private val context: Context) {
+
+    init {
+        com.google.mlkit.common.sdkinternal.MlKitContext.initializeIfNeeded(context)
+    }
 
     private val options = TranslatorOptions.Builder()
         .setSourceLanguage(TranslateLanguage.CHINESE)
         .setTargetLanguage(TranslateLanguage.ENGLISH)
         .build()
 
-    private val translator by lazy { Translation.getClient(options) }
+    private val translator by lazy {
+        Translation.getClient(options)
+    }
 
     suspend fun translate(text: String): String {
         return try {

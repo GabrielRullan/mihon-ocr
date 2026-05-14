@@ -222,7 +222,7 @@ class WebtoonPageHolder(
                                 }
                             }
                         } catch (e: Exception) {
-                            logcat(logcat.LogPriority.ERROR, e)
+                            logcat(LogPriority.ERROR, e)
                         }
                     }
                 }

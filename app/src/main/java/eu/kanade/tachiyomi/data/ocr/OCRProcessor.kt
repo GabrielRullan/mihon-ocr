@@ -13,7 +13,13 @@ import java.io.File
 
 class OCRProcessor(private val context: Context) {
 
-    private val recognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+    init {
+        com.google.mlkit.common.sdkinternal.MlKitContext.initializeIfNeeded(context)
+    }
+
+    private val recognizer by lazy {
+        TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
+    }
 
     suspend fun processImage(file: File): OCRResultData? {
         return processImage(Uri.fromFile(file))

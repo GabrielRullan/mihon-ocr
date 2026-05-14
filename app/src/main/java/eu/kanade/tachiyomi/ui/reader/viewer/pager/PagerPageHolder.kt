@@ -177,19 +177,25 @@ class PagerPageHolder(
                 )
                 setOcrData(page.ocrData, viewer.config.ocrEnabled)
                 if (page.ocrData == null && viewer.config.ocrEnabled) {
+                    logcat { "OCRProcessor: Start processing image" }
                     scope.launchIO {
                         try {
                             val ocrProcessor = Injekt.get<eu.kanade.tachiyomi.data.ocr.OCRProcessor>()
                             val bitmap = streamFn().use { android.graphics.BitmapFactory.decodeStream(it) }
                             if (bitmap != null) {
+                                logcat { "OCRProcessor: Bitmap decoded, size ${bitmap.width}x${bitmap.height}" }
                                 val data = ocrProcessor.processImage(bitmap)
+                                logcat { "OCRProcessor: Processing done. Blocks found: ${data?.blocks?.size}" }
                                 page.ocrData = data
                                 withUIContext {
                                     setOcrData(data, viewer.config.ocrEnabled)
+                                    logcat { "OCRProcessor: setOcrData finished" }
                                 }
+                            } else {
+                                logcat(LogPriority.ERROR) { "OCRProcessor: Bitmap is null!" }
                             }
                         } catch (e: Exception) {
-                            logcat(LogPriority.ERROR, e)
+                            logcat(LogPriority.ERROR, e) { "OCRProcessor error: ${e.message}" }
                         }
                     }
                 }

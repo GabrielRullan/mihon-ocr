@@ -73,6 +73,9 @@ abstract class ViewerConfig(readerPreferences: ReaderPreferences, private val sc
 
         readerPreferences.showNavigationOverlayOnStart
             .register({ navigationOverlayOnStart = it })
+
+        readerPreferences.ocrEnabled
+            .register({ ocrEnabled = it }, { imagePropertyChangedListener?.invoke() })
     }
 
     protected abstract fun defaultNavigation(): ViewerNavigation
